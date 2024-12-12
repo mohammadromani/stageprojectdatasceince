@@ -15,7 +15,7 @@ collection = db["articles"]
 @app.route('/top_keywords', methods=['GET'])
 def top_keywords():
     pipeline = [
-        {"$unwind": "$keywords"},
+           {"$unwind": "$keywords"},
         {"$group": {"_id": "$keywords", "count": {"$sum": 1}}},
         {"$sort": {"count": -1}},
         {"$limit": 10}
@@ -32,39 +32,72 @@ def top_authors():
     ]
     result = list(collection.aggregate(pipeline))
     return jsonify(result)
-
+#
+# @app.route('/articles_by_date', methods=['GET'])
+# def articles_by_date():
+#     pipeline = [
+#         {"$group": {"_id": "$published_time", "count": {"$sum": 1}}},
+#         {"$sort": {"_id": 1}}  # Sort by date
+#     ]
+#     result = list(collection.aggregate(pipeline))
+#     return jsonify(result)
 @app.route('/articles_by_date', methods=['GET'])
 def articles_by_date():
     pipeline = [
-        {"$group": {"_id": "$published_date", "count": {"$sum": 1}}},
-        {"$sort": {"_id": 1}}  # Sort by date
+        {
+            # Convert published_time to a date string (YYYY-MM-DD)
+            "$addFields": {
+                "published_date": {
+                    "$dateToString": {"format": "%Y-%m-%d", "date": "$published_time"}
+                }
+            }
+        },
+        {
+            # Group articles by the formatted date
+            "$group": {"_id": "$published_date", "count": {"$sum": 1}}
+        },
+        {
+            # Sort by date
+            "$sort": {"_id": 1}
+        }
     ]
+
     result = list(collection.aggregate(pipeline))
     return jsonify(result)
 
 @app.route('/articles_by_word_count', methods=['GET'])
 def articles_by_word_count():
-    pipeline = [
-        {"$project": {"word_count": {"$size": {"$split": ["$content", " "]}}}},
-        {"$group": {"_id": "$word_count", "count": {"$sum": 1}}},
-        {"$sort": {"_id": 1}}  # Sort by word count
-    ]
-    result = list(collection.aggregate(pipeline))
-    return jsonify(result)
+    try:
+        # Define the aggregation pipeline to sort articles by word count in descending order
+        pipeline = [
+            {"$sort": {"word_count": -1}},  # Sort by word_count in descending order
+            {"$project": {  # Optionally, include only specific fields
+                "_id": 0,
+                "post_id": 1,
+                "word_count": 1
+            }}
+        ]
+
+        result = list(collection.aggregate(pipeline))
+        return jsonify(result)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 
 @app.route('/articles_by_language', methods=['GET'])
 def articles_by_language():
     total_articles = collection.count_documents({})  # Total number of articles
     pipeline = [
-        {"$group": {"_id": "$language", "count": {"$sum": 1}}},
+        {"$group": {"_id": "$lang", "count": {"$sum": 1}}},
         {"$sort": {"count": -1}}
     ]
     result = list(collection.aggregate(pipeline))
 
     # Calculate percentage for each language
-    for language_data in result:
-        language_data['percentage'] = (language_data['count'] / total_articles) * 100
+    #for language_data in result:
+      #  language_data['percentage'] = (language_data['count'] / total_articles) * 100
     return jsonify(result)
 
 @app.route('/articles_by_classes', methods=['GET'])
@@ -257,5 +290,7 @@ def most_updated_articles():
     result = list(collection.aggregate(pipeline))
     return jsonify(result)
 
-if __name__ == '_main_':
+
+
+if __name__ == '__main__':
     app.run(debug=True)

@@ -1,6 +1,7 @@
 import pymongo
 import json
 import os
+from datetime import datetime
 
 # Connect to MongoDB
 client = pymongo.MongoClient("mongodb://localhost:27017/")
@@ -17,6 +18,12 @@ for filename in os.listdir(directory):
         # Load JSON data from file
         with open(file_path, 'r', encoding='utf-8') as file:
             data = json.load(file)
+
+        for article in data:
+            if 'published_time' in article and isinstance(article['published_time'], str):
+                article['published_time'] = datetime.fromisoformat(article['published_time'])
+            if 'last_updated' in article and isinstance(article['last_updated'], str):
+                article['last_updated'] = datetime.fromisoformat(article['last_updated'])
 
         # Insert data into the MongoDB collection
         try:

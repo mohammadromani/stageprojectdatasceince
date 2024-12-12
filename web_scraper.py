@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -5,7 +7,9 @@ import os
 from typing import List, Optional
 from dataclasses import dataclass, asdict
 import concurrent.futures
+import datetime
 import lxml
+from dateutil import parser
 
 
 @dataclass
@@ -18,13 +22,20 @@ class ArticleMetadata:
     video_duration: Optional[str]
     word_count: int
     lang: Optional[str]
-    published_time: str
-    last_updated: str
+    published_time: datetime
+    last_updated: datetime
     description: Optional[str]
     author: str
     classes: List[str]
     full_text: str
 
+
+    def to_dict(self):
+        # Convert datetime objects to ISO 8601 strings
+        data = asdict(self)
+        data['published_time'] = self.published_time.isoformat()
+        data['last_updated'] = self.last_updated.isoformat()
+        return data
 
 class ArticleScraper:
     def __init__(self, output_dir: str):
@@ -40,6 +51,12 @@ class ArticleScraper:
         sitemap_urls = [tag.text for tag in soup.find_all('loc')]
         print(f"Found {len(sitemap_urls)} monthly sitemaps.")
         return sitemap_urls
+
+    def _parse_datetime(self,datetime_str):
+        try:
+            return parser.isoparse(datetime_str)
+        except (ValueError, TypeError):
+            return datetime.min  # Fallback if parsing fails
 
     def fetch_article_urls(self, sitemap_url: str) -> List[str]:
         """Fetch article URLs from a monthly sitemap."""
@@ -72,8 +89,9 @@ class ArticleScraper:
                     video_duration=str(metadata.get('video_duration', 'unknown')),
                     word_count=self._parse_int(metadata.get('word_count', 0)),
                     lang=str(metadata.get('lang', 'unknown')),
-                    published_time=str(metadata.get('published_time', 'unknown')),
-                    last_updated=str(metadata.get('last_updated', 'unknown')),
+                    # print(metadata.get('published_time', ''))
+                    published_time=self._parse_datetime(metadata.get('published_time', '')),
+                    last_updated=self._parse_datetime(metadata.get('last_updated', '')),
                     description=str(metadata.get('description', 'unknown')),
                     author=str(metadata.get('author', 'unknown')),
                     classes=self._parse_list(metadata.get('classes', '')),
@@ -111,7 +129,7 @@ class ArticleScraper:
         print(f"Saving {len(articles)} articles to {file_path}")
 
         with open(file_path, 'w', encoding='utf-8') as json_file:
-            json.dump([asdict(article) for article in articles], json_file, ensure_ascii=False, indent=4)
+            json.dump([article.to_dict() for article in articles], json_file, ensure_ascii=False, indent=4)
 
         self.current_file_index += 1
         self.current_article_count = 0
@@ -141,7 +159,7 @@ class ArticleScraper:
                             self.current_article_count += 1
                             print(f"Scraped article: {article.title}")
 
-                            if self.current_article_count == 1000:
+                            if self.current_article_count == 10:
                                 self.save_articles(articles)
                                 articles = []  # Reset articles list
 
@@ -158,8 +176,9 @@ class ArticleScraper:
             self.save_articles(articles)
 
 
+
 # Main execution block
 if __name__ == "__main__":
     main_sitemap_url = "https://www.almayadeen.net/sitemaps/all.xml"
     scraper = ArticleScraper(output_dir="scraped_articles")
-    scraper.process_sitemaps(main_sitemap_url=main_sitemap_url, article_limit=5)
+    scraper.process_sitemaps(main_sitemap_url=main_sitemap_url, article_limit=10000)

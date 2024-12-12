@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recent Articles Visualization</title>
+    <!-- Include amCharts -->
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .chart-container {
+            max-width: 900px;
+            margin: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Recent Articles</h2>
+
+    <div class="chart-container" id="chartdiv"></div>
+
+    <table id="articlesTable">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Published Time</th>
+            <th>Last Updated</th>
+        </tr>
+    </thead>
+    <tbody id="tableBody">
+        <!-- Rows will be dynamically populated -->
+    </tbody>
+</table>
+
+
+    <script>
+        const articles = [
+            // Sample article data (to be replaced dynamically)
+            { title: "Understanding AI Trends", author: "John Doe", published_time: "2023-12-01", last_updated: "2023-12-02", keywords: "AI, Tech, Future" },
+            { title: "Economic Insights", author: "Jane Smith", published_time: "2023-11-15", last_updated: "2023-11-20", keywords: "Economy, Analysis" }
+        ];
+
+        // Populate the HTML table dynamically
+        const tableBody = document.getElementById("tableBody");
+
+        articles.forEach(article => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${article.title}</td>
+                <td>${article.author}</td>
+                <td>${article.published_time}</td>
+                <td>${article.last_updated}</td>
+                <td>${article.keywords}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        console.log("Articles loaded in HTML Table.");
+    </script>
+
+</body>
+</html>

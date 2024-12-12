@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Articles By Classes Chart (Stacked Bar)</title>
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+</head>
+<body>
+    <h1>Articles By Classes Chart (Stacked Bar)</h1>
+    <div id="chartdiv" style="width: 100%; height: 500px;"></div>
+
+    <script>
+        // Fetch data from the Flask API
+        async function fetchData() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/articles_by_classes');
+                const data = await response.json();
+
+                // Transform data for amCharts
+                const chartData = data.map(item => ({
+                    category: item._id,
+                    classA: item.classA || 0,
+                    classB: item.classB || 0,
+                    classC: item.classC || 0
+                }));
+
+                createChart(chartData);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Create amCharts stacked bar chart
+        function createChart(data) {
+            am5.ready(function() {
+                var root = am5.Root.new("chartdiv");
+
+                root.setThemes([am5themes_Animated.new(root)]);
+
+                var chart = root.container.children.push(
+                    am5xy.XYChart.new(root, {
+                        panX: true,
+                        panY: true,
+                        wheelX: "panX",
+                        wheelY: "zoomX",
+                        layout: root.verticalLayout
+                    })
+                );
+
+                // Set up X-axis
+                var xAxis = chart.xAxes.push(
+                    am5xy.CategoryAxis.new(root, {
+                        categoryField: "category",
+                        renderer: am5xy.AxisRendererX.new(root, {
+                            minGridDistance: 30
+                        })
+                    })
+                );
+
+                xAxis.data.setAll(data);
+
+                // Set up Y-axis
+                var yAxis = chart.yAxes.push(
+                    am5xy.ValueAxis.new(root, {
+                        renderer: am5xy.AxisRendererY.new(root, {})
+                    })
+                );
+
+                // Add series for each class
+                function createSeries(name, field, color) {
+                    var series = chart.series.push(
+                        am5xy.ColumnSeries.new(root, {
+                            name: name,
+                            xAxis: xAxis,
+                            yAxis: yAxis,
+                            valueYField: field,
+                            categoryXField: "category",
+                            stacked: true,
+                            tooltip: am5.Tooltip.new(root, {
+                                labelText: "{name}: {valueY}"
+                            })
+                        })
+                    );
+
+                    series.columns.template.setAll({ fill: color, stroke: color });
+                    series.data.setAll(data);
+                }
+
+                createSeries("Class A", "classA", am5.color(0x845EC2));
+                createSeries("Class B", "classB", am5.color(0xFF6F91));
+                createSeries("Class C", "classC", am5.color(0xFFC75F));
+
+                // Add legend
+                chart.set("legend", am5.Legend.new(root, {}));
+
+                // Add animations
+                chart.appear(1000, 100);
+            });
+        }
+
+        // Fetch and render data
+        fetchData();
+    </script>
+</body>
+</html>

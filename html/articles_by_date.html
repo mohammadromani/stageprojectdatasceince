@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Keywords Chart</title>
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+</head>
+<body>
+    <h1>Articles By Date Chart (Line)</h1>
+    <div id="chartdiv" style="width: 100%; height: 500px;"></div>
+
+    <script>
+        // Fetch data from the Flask API
+        async function fetchData() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/articles_by_date');
+                const data = await response.json();
+
+                // Transform data for amCharts
+                const chartData = data.map(item => ({
+                    category: item._id,
+                    value: item.count
+                }));
+
+                createChart(chartData);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Create amCharts line chart
+        function createChart(data) {
+            am5.ready(function() {
+                var root = am5.Root.new("chartdiv");
+
+                root.setThemes([am5themes_Animated.new(root)]);
+
+                var chart = root.container.children.push(
+                    am5xy.XYChart.new(root, {
+                        panX: true,
+                        panY: true,
+                        wheelX: "panX",
+                        wheelY: "zoomX"
+                    })
+                );
+
+                // Set up X-axis
+                var xAxis = chart.xAxes.push(
+                    am5xy.CategoryAxis.new(root, {
+                        categoryField: "category",
+                        renderer: am5xy.AxisRendererX.new(root, {
+                            minGridDistance: 20
+                        })
+                    })
+                );
+
+                xAxis.data.setAll(data);
+
+                var yAxis = chart.yAxes.push(
+                    am5xy.ValueAxis.new(root, {
+                        renderer: am5xy.AxisRendererY.new(root, {})
+                    })
+                );
+
+                // Use LineSeries instead of ColumnSeries
+                var series = chart.series.push(
+                    am5xy.LineSeries.new(root, {
+                        name: "Top Keywords",
+                        xAxis: xAxis,
+                        yAxis: yAxis,
+                        valueYField: "value",
+                        categoryXField: "category",
+                        stroke: am5.color(0xff5722),
+                        fillOpacity: 0.2
+                    })
+                );
+
+                series.data.setAll(data);
+
+                // Add legend and animations
+                chart.set("legend", am5.Legend.new(root, {}));
+                series.appear(1000);
+                chart.appear(1000, 100);
+            });
+        }
+
+        // Fetch and render data
+        fetchData();
+    </script>
+</body>
+</html>
