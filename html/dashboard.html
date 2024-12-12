@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>amCharts Line and Bar Chart Example</title>
+
+    <!-- Load amCharts -->
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+</head>
+<body>
+
+    <!-- Line Chart Container -->
+    <div id="chartdiv" style="width: 100%; height: 500px;"></div>
+
+    <!-- Bar Chart Container -->
+    <div id="barchartdiv" style="width: 100%; height: 500px;"></div>
+
+    <script>
+        let originalLineChartData = [];
+        let rootLineChart, rootBarChart;
+
+        async function getLineChartData() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/dashboard_count_time');
+                const data = await response.json();
+
+                originalLineChartData = data.map(item => ({
+                    date: item._id,
+                    count: item.count
+                }));
+
+                createLineChart(originalLineChartData);
+
+            } catch (error) {
+                console.error('Failed to fetch Line Chart data:', error);
+            }
+        }
+
+        async function getBarChartData(filteredDates) {
+            try {
+                console.log(filteredDates);
+                   const startyear = filteredDates.start.getFullYear();
+const startmonth = String(filteredDates.start.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed
+const startday = String(filteredDates.start.getDate()).padStart(2, '0');
+
+// Format the date as YYYY-MM-DD
+const formattedStartDate = `${startyear}-${startmonth}-${startday}`;
+
+                   const endyear = filteredDates.end.getFullYear();
+const endmonth = String(filteredDates.end.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed
+const endday = String(filteredDates.end.getDate()).padStart(2, '0');
+
+// Format the date as YYYY-MM-DD
+const formattedEndDate = `${endyear}-${endmonth}-${endday}`;
+
+                // Filter bar chart data based on zoom selection
+                        const response = await fetch(`http://127.0.0.1:5000/top_keywords_by_time?start_date=${formattedStartDate}&end_date=${formattedEndDate}`, {
+            credentials: 'include'  // Try including credentials if needed
+        });
+        const data = await response.json();
+
+                // Filter data according to selected zoom range
+                const filteredData = data.map(item => ({
+                    category: item._id,
+                    value: item.count
+                }));
+
+                createBarChart(filteredData);
+
+            } catch (error) {
+                console.error('Failed to fetch Bar Chart data:', error);
+            }
+        }
+
+        function createLineChart(data) {
+            am5.ready(function() {
+                rootLineChart = am5.Root.new("chartdiv");
+                rootLineChart.setThemes([am5themes_Animated.new(rootLineChart)]);
+
+                const chart = rootLineChart.container.children.push(
+                    am5xy.XYChart.new(rootLineChart, {
+                        panX: true,
+                        panY: true,
+                        wheelX: "panX",
+                        wheelY: "zoomX",
+                        pinchZoomX: true,
+                        paddingLeft: 0
+                    })
+                );
+
+                const cursor = chart.set("cursor", am5xy.XYCursor.new(rootLineChart, {
+                    behavior: "none"
+                }));
+
+                const xAxis = chart.xAxes.push(
+                    am5xy.DateAxis.new(rootLineChart, {
+                        baseInterval: { timeUnit: "day", count: 1 },
+                        renderer: am5xy.AxisRendererX.new(rootLineChart, { minorGridEnabled: true }),
+                        tooltip: am5.Tooltip.new(rootLineChart, {})
+                    })
+                );
+
+                const yAxis = chart.yAxes.push(
+                    am5xy.ValueAxis.new(rootLineChart, {
+                        renderer: am5xy.AxisRendererY.new(rootLineChart, { pan: "zoom" })
+                    })
+                );
+
+                const series = chart.series.push(
+                    am5xy.LineSeries.new(rootLineChart, {
+                        name: "Article Count",
+                        xAxis: xAxis,
+                        yAxis: yAxis,
+                        valueYField: "count",
+                        valueXField: "date",
+                        tooltip: am5.Tooltip.new(rootLineChart, {
+                            labelText: "{valueY}"
+                        })
+                    })
+                );
+
+                series.data.setAll(data);
+
+                xAxis.on("end", zoomEnded);
+
+                function zoomEnded() {
+                    const zoomStartDate = new Date(xAxis.getPrivate("selectionMin"));
+                    const zoomEndDate = new Date(xAxis.getPrivate("selectionMax"));
+                    console.log("Zoom Start:", zoomStartDate);
+                    console.log("Zoom End:", zoomEndDate);
+
+                    getBarChartData({ start: zoomStartDate, end: zoomEndDate });
+                }
+            });
+        }
+
+        function createBarChart(data) {
+            am5.ready(function() {
+                if (rootBarChart) rootBarChart.dispose();
+
+                rootBarChart = am5.Root.new("barchartdiv");
+
+                rootBarChart.setThemes([am5themes_Animated.new(rootBarChart)]);
+
+                const chart = rootBarChart.container.children.push(
+                    am5xy.XYChart.new(rootBarChart, {
+                        panX: true,
+                        panY: true,
+                        wheelX: "panX",
+                        wheelY: "zoomX"
+                    })
+                );
+
+                const xAxis = chart.xAxes.push(
+                    am5xy.CategoryAxis.new(rootBarChart, {
+                        categoryField: "category",
+                        renderer: am5xy.AxisRendererX.new(rootBarChart, {
+                            minGridDistance: 20
+                        })
+                    })
+                );
+
+                xAxis.data.setAll(data);
+
+                const yAxis = chart.yAxes.push(
+                    am5xy.ValueAxis.new(rootBarChart, {
+                        renderer: am5xy.AxisRendererY.new(rootBarChart, {})
+                    })
+                );
+
+                const series = chart.series.push(
+                    am5xy.ColumnSeries.new(rootBarChart, {
+                        name: "Top Keywords",
+                        xAxis: xAxis,
+                        yAxis: yAxis,
+                        valueYField: "value",
+                        categoryXField: "category"
+                    })
+                );
+
+                series.data.setAll(data);
+                chart.set("legend", am5.Legend.new(rootBarChart, {}));
+
+            });
+        }
+
+        getLineChartData();
+
+    </script>
+
+</body>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>amCharts Bar Chart Example</title>
+
+    <!-- Include amCharts Library -->
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
+</head>
+<body>
+
+    <h2>Bar Chart for Article Titles</h2>
+
+    <div id="chartdiv" style="height: 500px;"></div>
+
+    <script>
+        // Fetch data from Flask API
+        async function fetchArticles() {
+            const response = await fetch('http://127.0.0.1:5000/articles_updated_after_publication');
+            const articles = await response.json();
+            return articles.map(article => article.title);
+        }
+
+        async function createChart() {
+            const titles = await fetchArticles();
+
+            // Create amCharts instance
+            am5.ready(function() {
+
+                am5.Theme.create("Animated");
+
+                var root = am5.Root.new("chartdiv");
+
+                root.setThemes([
+                    am5themes_Animated.new(root)
+                ]);
+
+                var chart = root.container.children.push(am5xy.XYChart.new(root, {}));
+
+                var xRenderer = am5xy.XYChart.xRenderer;
+                var yRenderer = am5xy.YRenderer;
+
+                var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
+                    categoryField: "title",
+                    renderer: xRenderer
+                }));
+
+                var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+                    renderer: yRenderer
+                }));
+
+                var series = chart.series.push(am5xy.ColumnSeries.new(root, {
+                    name: "Article",
+                    xAxis: xAxis,
+                    yAxis: yAxis,
+                    valueYField: "value",
+                    categoryXField: "title"
+                }));
+
+                const data = titles.map((title, idx) => ({
+                    title: title,
+                    value: Math.random() * 100
+                }));
+
+                series.data.setAll(data);
+            });
+        }
+
+        createChart();
+
+    </script>
+
+</body>
+</html>

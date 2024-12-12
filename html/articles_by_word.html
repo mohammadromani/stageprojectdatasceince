@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Articles by Keyword</title>
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+</head>
+<body>
+    <h1>Articles by Keyword</h1>
+    <div id="chartdiv" style="width: 100%; height: 500px;"></div>
+    <script>
+        am5.ready(function() {
+            const root = am5.Root.new("chartdiv");
+            root.setThemes([am5themes_Animated.new(root)]);
+            const chart = root.container.children.push(am5xy.XYChart.new(root, {}));
+            const xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, { categoryField: "keyword" }));
+            const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {}));
+            const series = chart.series.push(am5xy.BubbleSeries.new(root, {
+                xAxis: xAxis,
+                yAxis: yAxis,
+                valueField: "count",
+                categoryField: "keyword",
+            }));
+            fetch('/api/articles-by-keyword')
+                .then(response => response.json())
+                .then(data => series.data.setAll(data))
+                .catch(err => console.error('Error loading articles by keyword:', err));
+        });
+    </script>
+</body>
+</html>

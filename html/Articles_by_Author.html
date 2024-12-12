@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authors Bar Chart</title>
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+</head>
+<body>
+    <div id="chartdiv" style="width: 100%; height: 500px;"></div>
+
+    <script>
+        // Fetch data from the Flask API
+        fetch("http://127.0.0.1:5000/authors_count")
+            .then(response => response.json())
+            .then(data => {
+                // Initialize chart
+                am5.ready(function () {
+                    let root = am5.Root.new("chartdiv");
+
+                    root.setThemes([
+                        am5themes_Animated.new(root)
+                    ]);
+
+                    // Create chart
+                    let chart = root.container.children.push(
+                        am5xy.XYChart.new(root, {
+                            panX: true,
+                            panY: true,
+                            wheelX: "panX",
+                            wheelY: "zoomX",
+                            layout: root.horizontalLayout
+                        })
+                    );
+
+                    // Create X-Axis (Category Axis for Authors)
+                    let xAxis = chart.xAxes.push(
+                        am5xy.CategoryAxis.new(root, {
+                            categoryField: "author",
+                            renderer: am5xy.AxisRendererX.new(root, {
+                                minGridDistance: 30
+                            }),
+                            tooltip: am5.Tooltip.new(root, {})
+                        })
+                    );
+
+                    // Create Y-Axis (Value Axis for Article Count)
+                    let yAxis = chart.yAxes.push(
+                        am5xy.ValueAxis.new(root, {
+                            renderer: am5xy.AxisRendererY.new(root, {})
+                        })
+                    );
+
+                    // Create series
+                    let series = chart.series.push(
+                        am5xy.ColumnSeries.new(root, {
+                            name: "Articles",
+                            xAxis: xAxis,
+                            yAxis: yAxis,
+                            valueYField: "article_count",
+                            categoryXField: "author",
+                            tooltip: am5.Tooltip.new(root, {
+                                labelText: "{author}: {article_count}"
+                            })
+                        })
+                    );
+
+                    // Add data
+                    xAxis.data.setAll(data);
+                    series.data.setAll(data);
+
+                    // Add legend (optional)
+                    chart.set("legend", am5.Legend.new(root, {}));
+
+                    // Animation
+                    series.appear(1000);
+                    chart.appear(1000, 100);
+                });
+            })
+            .catch(error => console.error("Error fetching data:", error));
+    </script>
+</body>
+</html>

@@ -5,21 +5,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b222bcd8-0dc2-4399-a459-36da396cda83" name="Changes" comment="project">
-      <change afterPath="$PROJECT_DIR$/flask.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/html/articles_by_classes.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/html/articles_by_date.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/html/articles_by_keyword.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/html/articles_by_language.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/html/articles_by_word_count.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/html/top_authors.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/html/top_keywords.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sentiment.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/spacyEntity.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/Articles_by_Author.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/artciles_updated.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/article_by_keyword.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/articles_by_keyword_count.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/articles_by_word.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/articles_with_thumbnail.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/articles_with_video.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/dashboard.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/entity_location_trend.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/entity_org_trend.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/entity_persons_trend.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/entity_trend_keyword.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/longest_articles.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/recent_articles.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/shortest_articles.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/test.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/top_categories.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/html/trend_keyword.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trendCalc.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_storage.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_storage.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scraped_articles/articles_01.json" beforeDir="false" afterPath="$PROJECT_DIR$/scraped_articles/articles_01.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web_scraper.py" beforeDir="false" afterPath="$PROJECT_DIR$/web_scraper.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/articles_by_keyword.html" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,6 +70,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "DefaultHtmlFileTemplate": "HTML File",
+    "Python.app (1).executor": "Run",
     "Python.app.executor": "Run",
     "Python.data_storage (1).executor": "Run",
     "Python.data_storage.executor": "Run",
@@ -70,6 +78,7 @@
     "Python.sentiment.executor": "Run",
     "Python.spacyEntity.executor": "Run",
     "Python.tests.executor": "Run",
+    "Python.trendCalc.executor": "Run",
     "Python.web_scraper (1).executor": "Run",
     "Python.web_scraper.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -77,8 +86,8 @@
     "settings.editor.selected.configurable": "preferences.lookFeel"
   }
 }]]></component>
-  <component name="RunManager" selected="Python.app">
-    <configuration name="app" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.app (1)">
+    <configuration name="app (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="stageproject" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -100,7 +109,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="data_storage" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="app" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="stageproject" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -113,7 +122,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data_storage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/app.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -188,7 +197,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="web_scraper (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="trendCalc" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="stageproject" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -201,7 +210,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/web_scraper.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/trendCalc.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -212,11 +221,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.app (1)" />
+        <item itemvalue="Python.trendCalc" />
         <item itemvalue="Python.app" />
         <item itemvalue="Python.spacyEntity" />
         <item itemvalue="Python.sentiment" />
-        <item itemvalue="Python.data_storage" />
-        <item itemvalue="Python.web_scraper (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -252,7 +261,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725809749104</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="project">
+      <option name="closed" value="true" />
+      <created>1733994943624</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1733994943624</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -277,6 +294,11 @@
           <url>file://$PROJECT_DIR$/spacyEntity.py</url>
           <line>65</line>
           <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>30</line>
+          <option name="timeStamp" value="15" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

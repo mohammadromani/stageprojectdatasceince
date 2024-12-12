@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Articles with Titles - 100% Pie Chart</title>
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+</head>
+<body>
+
+    <div id="chartdiv" style="width: 100%; height: 500px;"></div>
+
+    <script>
+        // Fetch data from the Flask API
+        fetch("http://127.0.0.1:5000/articles_with_thumbnail")
+            .then(response => response.json())
+            .then(data => {
+                console.log("Fetched Data:", data);
+
+                // Since all articles contain titles, we'll visualize 100% as a single segment
+                am5.ready(function () {
+                    let root = am5.Root.new("chartdiv");
+
+                    root.setThemes([
+                        am5themes_Animated.new(root)
+                    ]);
+
+                    let chart = root.container.children.push(
+                        am5percent.PieChart.new(root, {})
+                    );
+
+                    let series = chart.series.push(
+                        am5percent.PieSeries.new(root, {
+                            valueField: "count",
+                            categoryField: "title"
+                        })
+                    );
+
+                    // Since every article has a title, create a single 100% segment
+                    let pieData = [
+                        { title: "Articles with thumbnail", count: data.length }
+                    ];
+
+                    series.data.setAll(pieData);
+
+                    chart.appear(1000, 100);
+                });
+            })
+            .catch(error => console.error("API Error:", error));
+    </script>
+
+</body>
+</html>

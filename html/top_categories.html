@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Classes Pie Chart</title>
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+</head>
+<body>
+    <h1>Top Classes Pie Chart</h1>
+    <div id="chartdiv" style="width: 100%; height: 500px;"></div>
+
+    <script>
+        // Fetch data from the API
+        async function fetchData() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/top_classes');
+                const data = await response.json();
+
+                // Transform data for the pie chart
+                const chartData = data.map(item => {
+                    const parsedId = JSON.parse(item._id.replaceAll("'", '"')); // Parse _id string to JSON
+                    return {
+                        category: parsedId.value,
+                        count: item.count
+                    };
+                });
+
+                createChart(chartData);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Create the pie chart
+        function createChart(data) {
+            am5.ready(function() {
+                // Create root element
+                var root = am5.Root.new("chartdiv");
+
+                // Set themes
+                root.setThemes([am5themes_Animated.new(root)]);
+
+                // Create chart
+                var chart = root.container.children.push(
+                    am5percent.PieChart.new(root, {
+                        layout: root.horizontalLayout
+                    })
+                );
+
+                // Create series
+                var series = chart.series.push(
+                    am5percent.PieSeries.new(root, {
+                        valueField: "count",
+                        categoryField: "category"
+                    })
+                );
+
+                // Set data
+                series.data.setAll(data);
+
+                // Animate chart and series
+                series.appear(1000, 100);
+                chart.appear(1000, 100);
+            });
+        }
+
+        // Fetch and render the chart
+        fetchData();
+    </script>
+</body>
+</html>

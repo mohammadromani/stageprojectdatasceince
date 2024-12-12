@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entity Trend Keyword</title>
+
+    <!-- Styles -->
+    <style>
+        #chartdiv {
+            width: 100%;
+            height: 500px;
+        }
+        .input-container {
+            margin: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px;
+            font-weight: bold;
+        }
+    </style>
+
+    <!-- Resources -->
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+</head>
+
+<body>
+
+    <!-- Input field to take the keyword -->
+    <div class="input-container">
+        <input id="keywordInput" type="text" placeholder="Enter keyword">
+        <button onclick="submitKeyword()">Load Data</button>
+    </div>
+
+    <!-- Chart container -->
+    <div id="chartdiv"></div>
+
+    <script>
+        async function fetchData(keyword) {
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/get_keyword/${keyword}`);
+                const data = await response.json();
+
+                const chartData = data.map(item => ({
+                    date: new Date(item.published_time).getTime(),
+                    count: 1
+                }));
+
+                createChart(chartData);
+            } catch (error) {
+                console.log(`http://127.0.0.1:5000/get_keyword/${keyword}`)
+                console.error('API call error:', error);
+            }
+        }
+       let root;  // Global reference to root
+
+function createChart(chartData) {
+    am5.ready(function() {
+        try {
+            // Clean up previous DOM node
+            if (root) {
+                root.dispose();
+                root = null;
+            }
+
+
+  // Create root element
+  var root = am5.Root.new("chartdiv");
+
+  // Set themes
+  root.setThemes([
+    am5themes_Animated.new(root)
+  ]);
+
+  // Create chart
+  var chart = root.container.children.push(am5xy.XYChart.new(root, {
+    panX: true,
+    panY: true,
+    wheelX: "panX",
+    wheelY: "zoomX",
+    pinchZoomX: true,
+    paddingLeft: 0
+  }));
+
+  // Add cursor
+  var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+    behavior: "none"
+  }));
+  cursor.lineY.set("visible", false);
+
+  // Create axes
+  var xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+    maxDeviation: 0.2,
+    baseInterval: {
+      timeUnit: "day",
+      count: 1
+    },
+    renderer: am5xy.AxisRendererX.new(root, {
+      minorGridEnabled: true
+    }),
+    tooltip: am5.Tooltip.new(root, {})
+  }));
+
+  var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+    renderer: am5xy.AxisRendererY.new(root, {
+      pan: "zoom"
+    })
+  }));
+
+  // Add series
+  var series = chart.series.push(am5xy.LineSeries.new(root, {
+    name: "Series",
+    xAxis: xAxis,
+    yAxis: yAxis,
+    valueYField: "count",
+    valueXField: "date",
+    tooltip: am5.Tooltip.new(root, {
+      labelText: "{valueY}"
+    })
+  }));
+
+  // Add bullets with labels
+  series.bullets.push(function() {
+    return am5.Bullet.new(root, {
+      sprite: am5.Label.new(root, {
+        text: "{entity}",
+        centerY: am5.p50,
+        centerX: am5.p50,
+        populateText: true
+      })
+    });
+  });
+
+  // Add scrollbar
+  chart.set("scrollbarX", am5.Scrollbar.new(root, {
+    orientation: "horizontal"
+  }));
+
+  series.data.setAll(chartData);
+
+  // Make stuff animate on load
+  series.appear(1000);
+  chart.appear(1000, 100);
+} catch (error) {
+            console.error("Chart rendering error:", error);
+        }
+    });
+}
+
+
+
+        function submitKeyword() {
+            const keyword = document.getElementById('keywordInput').value.trim();
+            if (keyword) {
+                console.log(keyword);
+                fetchData(keyword);
+            } else {
+                alert('Please enter a keyword');
+            }
+        }
+    </script>
+
+</body>
+</html>
